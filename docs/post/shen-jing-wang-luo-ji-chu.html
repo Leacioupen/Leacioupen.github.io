@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script><link rel="preconnect" href="https://code.buxiantang.top"><link rel="preconnect" href="https://blog.meekdai.com"><link rel="stylesheet" href="https://code.buxiantang.top/assets/GmeekBaseTheme.css"><script src="https://code.buxiantang.top/assets/GmeekCustomizeCss.js"></script>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/94221661?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="# 神经网络基础
+[TOC]
+
+## 感知机
+
+感知机是**一个人工神经元**，是神经网络中最基本的计算单元。">
+<meta property="og:title" content="神经网络基础">
+<meta property="og:description" content="# 神经网络基础
+[TOC]
+
+## 感知机
+
+感知机是**一个人工神经元**，是神经网络中最基本的计算单元。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://Leacioupen.github.io/post/shen-jing-wang-luo-ji-chu.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/94221661?v=4">
+<title>神经网络基础</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">神经网络基础</h1>
+<div class="title-right">
+    <a href="https://Leacioupen.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/Leacioupen/Leacioupen.github.io/issues/3" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>神经网络基础</h1>
+<p>[TOC]</p>
+<h2>感知机</h2>
+<p>感知机是<strong>一个人工神经元</strong>，是神经网络中最基本的计算单元。你可以把它想象成一个最简单的“大脑细胞”。</p>
+<p>它的核心功能是：<strong>接受多个输入信号，产生一个输出信号。</strong></p>
+<h3>一、工作原理</h3>
+<p>我们用一个简单的例子来理解：<strong>根据天气情况决定是否出门玩球</strong>。</p>
+<p>假设我们只考虑两个因素（两个输入特征）：</p>
+<ol>
+<li><em>x</em>1：天气是否晴朗？（是：1， 否：0）</li>
+<li><em>x</em>2：朋友是否同行？（是：1， 否：0）</li>
+</ol>
+<p>输出 <em>y</em>：出门玩球（去：1， 不去：0）。</p>
+<p>结构分解</p>
+<p>一个感知机的结构包含三个部分：</p>
+<ol>
+<li>
+<p><strong>输入</strong>： 每个输入 $x_i$代表一个特征。每个特征都有一个<strong>权重</strong> $w_i$，表示这个特征的重要程度。比如，如果你更看重天气，那么“天气”这个特征的权重 <em>w</em>1就会比较大。偏置项 <em>b</em>： 一个常数项，可以理解为“门槛”。即使输入都为0，偏置项也会影响输出。</p>
+</li>
+<li>
+<p><strong>计算加权和</strong>：感知机首先计算所有输入的加权和，再加上偏置。</p>
+<p>​	<em>z</em>=(<em>w</em>1×<em>x</em>1)+(<em>w</em>2×<em>x</em>2)+<em>b</em></p>
+</li>
+<li>
+<p><strong>激活函数</strong>：然后，将这个加权和 <em>z</em>送入一个<strong>激活函数</strong>，产生最终的输出。感知机使用的激活函数是 <strong>阶跃函数</strong>：</p>
+<p>​	如果 <em>z</em>&gt;0， 则输出 <em>y</em>=1（正类，出门）。</p>
+<p>​	如果 <em>z</em>≤0，则输出 <em>y</em>=0（负类，不出门）。</p>
+</li>
+</ol>
+<p>用数学公式表示就是：<br>
+$$<br>
+y = \begin{cases}</p>
+<p>1 &amp; \text{if } w_1x_1 + w_2x_2 + b &gt; 0 \</p>
+<p>0 &amp; \text{otherwise}</p>
+<p>\end{cases}<br>
+$$</p>
+<p>###　二、感知机如何学习</p>
+<p>感知机的神奇之处在于它可以<strong>自动从数据中学习</strong>到合适的权重 <em>w</em>和偏置 <em>b</em>。这个过程叫做<strong>训练</strong>。</p>
+<p><strong>学习规则（感知机学习算法）：</strong></p>
+<ol>
+<li>
+<p><strong>初始化</strong>： 随机设置权重 <em>w</em>和偏置 <em>b</em>的初始值（比如，都设为0或很小的随机数）。</p>
+</li>
+<li>
+<p><strong>遍历数据</strong>： 对于训练数据中的每一个样本 (<em>x</em>,<em>y<strong>t</strong>r<strong>u</strong>e</em>)：</p>
+<p>​	<strong>前向传播</strong>： 根据当前的 <em>w</em>和 <em>b</em>，计算感知机的预测输出 $y_{pred}$</p>
+<p>​	<strong>计算误差</strong>： 比较预测值 $y_{pred}$和真实值 $y_{true}$。</p>
+<p>​	<strong>更新参数</strong>： 如果预测错了，就按照以下规则更新权重和偏置：</p>
+<p>​		<strong>如果预测为0，但真实是1（低估了）</strong>：$w_i=w_i+ η×  x_i$（增加权重，使下次更容易输出1）；<em>b</em>=<em>b</em>+<em>η</em>（降低门槛）</p>
+<p>​		<strong>如果预测为1，但真实是0（高估了）</strong>：$w_i=w_i- η×  x_i$（减少权重，使下次更容易输出0）；<em>b</em>=<em>b</em>−<em>η</em>（提高门槛）</p>
+<p>​		<strong>如果预测正确</strong>： 不更新参数。其中，<em>η</em>是一个重要的超参数，叫做<strong>学习率</strong>，它控制每次更新的步长。</p>
+</li>
+</ol>
+<p><strong>直观理解</strong>：这个更新规则非常直观。比如，一个特征 <em>x</em>1（天气晴朗）本应导致出门（y=1），但模型却预测不出门（y=0）。那么，算法就会提高 <em>x</em>1的权重 <em>w</em>1，这样下次再遇到天气晴朗时，加权和 <em>z</em>就更容易大于0，从而做出正确的预测。</p>
+<h3>三、感知机的局限性</h3>
+<p>尽管感知机很强大，但它有一个致命的缺陷，这直接导致了AI领域的第一次冬天：</p>
+<p><strong>感知机只能解决线性可分的问题。</strong></p>
+<ul>
+<li><strong>什么是线性可分？</strong> 意味着存在一条直线（或一个平面）能够完美地将所有不同类别的点分开。</li>
+</ul>
+<p><strong>经典的“异或”问题</strong>：</p>
+<p>假设我们有四个数据点，输入和输出如下：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th align="center"><em>x</em>1</th>
+<th align="center"><em>x</em>2</th>
+<th align="center"><em>y</em>(输出)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p>这其实就是逻辑运算中的“异或”（XOR）问题：当两个输入不同时输出1，相同时输出0。</p>
+<p><strong>尝试在坐标轴上画一下这4个点</strong>：</p>
+<p>(0,0) 和 (1,1) 是“0”类。</p>
+<p>(0,1) 和 (1,0) 是“1”类。</p>
+<p>你会发现，<strong>你永远无法用一条直线将“0”类点和“1”类点分开</strong>。这就是非线性可分问题。<strong>单层感知机无法解决这个问题</strong>。</p>
+<h2>多层感知机</h2>
+<h3>一、什么是多层感知机 &amp; 为什么需要多层感知机</h3>
+<p><strong>多层感知机（MLP）是由多个感知机（神经元）组合而成的前馈人工神经网络</strong>。它至少包含三层：<strong>输入层</strong>，<strong>一个或多个隐藏层</strong>，<strong>输出层</strong>。</p>
+<p>MLP成功解决了单层感知机无法解决的<strong>非线性可分问题</strong>（如著名的"异或"问题），是深度学习中最基础、最重要的网络结构之一。</p>
+<p>回顾一下单层感知机的局限：<strong>只能解决线性可分问题</strong>。</p>
+<p><strong>多层感知机的核心思想</strong>：</p>
+<p>​	<strong>分层处理</strong>：通过加入隐藏层，网络可以学习<strong>层次化的特征</strong>。</p>
+<p>​	<strong>组合特征</strong>：第一层学习基础特征，第二层将这些基础特征组合成更复杂的特征，以此类推。</p>
+<p>​	<strong>非线性变换</strong>：每层之后使用<strong>非线性激活函数</strong>，使网络能够拟合任意复杂的非线性函数。</p>
+<p><strong>直观比喻</strong>：</p>
+<p>​	<strong>单层感知机</strong>：像一个只会做单一判断的保安（"有证件就进"）。</p>
+<p>​	<strong>多层感知机</strong>：像一个完整的安检系统：<strong>第一层（隐藏层）</strong>：多个"传感器"分别检查不同项目（如金属探测、X光扫描）。<strong>第二层（隐藏层）</strong>：综合分析各个传感器的结果（"有金属但非刀具，液体安全"）。<strong>第三层（输出层）</strong>：做出最终决策（"允许通过"）。</p>
+<h3>二、多层感知机详细结构</h3>
+<p>让我们以一个经典的网络结构为例：包含1个隐藏层的MLP。</p>
+<pre class="notranslate"><code class="notranslate">输入层 (3个节点) → 隐藏层 (4个节点) → 输出层 (2个节点)
+</code></pre>
+<h4>1. 输入层</h4>
+<p>​	<strong>功能</strong>：接收原始输入特征，不进行任何计算，只是将数据传递到下一层。</p>
+<p>​	<strong>节点数</strong>：等于输入特征的维度。如图例中假设每个样本有3个特征。</p>
+<h4>2. 隐藏层</h4>
+<p>​	<strong>功能</strong>：这是网络的"大脑"，进行真正的信息处理。</p>
+<p>​	<strong>计算过程</strong>：</p>
+<pre class="notranslate"><code class="notranslate">	1. 收来自输入层的信号
+	2. 计算加权和：$z^{(1)}=W^{(1)}x+b^{(1)}$
+	3. 应用**非线性激活函数**：$$a^{(1)}=f(z^{(1)})$$
+</code></pre>
+<p>​	<strong>关键</strong>：使用非线性激活函数是MLP能够学习非线性关系的原因！</p>
+<h4>3. 输出层</h4>
+<p>​	<strong>功能</strong>：产生最终的预测结果。</p>
+<p>​	<strong>计算过程</strong>：与隐藏层类似，但激活函数的选择取决于任务类型：</p>
+<p>​		<strong>二分类</strong>：1个节点 + Sigmoid函数</p>
+<p>​		<strong>多分类</strong>：多个节点 + Softmax函数</p>
+<p>​		<strong>回归</strong>：1个或多个节点 + 线性激活函数（或无激活函数）</p>
+<h4>4. 全连接</h4>
+<p>​	每一层的<strong>每个神经元</strong>都与前一层的<strong>所有神经元</strong>相连接。这就是为什么MLP也常被称为<strong>全连接网络</strong>。</p>
+<h3>三、激活函数：MLP的非线性之源</h3>
+<p>这是MLP与单层感知机的<strong>本质区别</strong>。单层感知机使用<strong>阶跃函数</strong>，而MLP使用平滑的、可导的非线性函数。</p>
+<p><strong>常用的激活函数：</strong></p>
+<ol>
+<li>
+<p>Sigmoid</p>
+<p>公式：$f(x)=\frac{1}{1+e^{-x}}$</p>
+<p>输出范围：(0,1)</p>
+<p>特点：容易导致梯度消失，现在较少用于隐藏层</p>
+<ol start="2">
+<li>tanh(双曲正切)</li>
+</ol>
+<p>公式：$f(x)=\frac{e^x-e^{ex}}{e^x+e^{-x}}$</p>
+<p>输出范围：(-1,1)</p>
+<p>特点：输出以0为中心，通常比sigmoid表现更好</p>
+<ol start="3">
+<li>ReLU(整流线性单元) <strong>-当前最常用</strong>
+</li>
+</ol>
+<p>公式：$f(x)=max(0,x)$</p>
+<p>特点：计算简单，有效缓解梯度消失问题。但可能导致“神经元死亡”</p>
+<ol start="4">
+<li>Softmax(主要用于输出层)</li>
+</ol>
+<p>功能：将多个神经元的输出转化为概率分布，所有输出值之和为1。</p>
+</li>
+</ol>
+<h3>四、损失函数：模型的"成绩单"</h3>
+<p><strong>简单定义</strong>：损失函数是一个衡量<strong>模型预测值</strong>与<strong>真实值</strong>之间差异的函数。</p>
+<p><strong>生动比喻</strong>：就像<strong>考试评分</strong>：你的答案（预测值）与标准答案（真实值）对比，得分越低说明答得越好。就像<strong>GPS导航</strong>：损失函数告诉你当前位置（预测）与目的地（真实）还有多远，指导你该如何调整方向（更新模型参数）。</p>
+<p>损失函数的值通常被称为<strong>损失</strong>或<strong>成本</strong>。我们的目标就是在训练过程中<strong>最小化这个损失值</strong>。</p>
+<h4>为什么需要损失函数？：学习的方向盘</h4>
+<ol>
+<li><strong>量化模型性能</strong>：提供一个具体的数值来衡量模型的好坏，而不是凭感觉。</li>
+<li><strong>指导模型优化</strong>：为梯度下降算法提供目标（要最小化的函数）。</li>
+<li><strong>提供学习信号</strong>：通过计算损失关于模型参数的梯度，告诉模型"应该如何调整参数才能表现得更好"。</li>
+</ol>
+<p><strong>没有损失函数，模型就无法学习！</strong></p>
+<h4>常见的损失函数</h4>
+<p>不同的任务需要使用不同的损失函数。以下是深度学习中最常用的几种：</p>
+<ol>
+<li>
+<p>均方误差损失（MSE Loss）—— 回归任务的标配</p>
+<p><strong>用途</strong>：主要用于<strong>回归问题</strong>，如预测房价、温度等连续值。</p>
+<p><strong>公式</strong>： $ MSE = \frac{1}{n}\sum_{i=1}^{n}\left(y_{i}-\hat{y}_{i}\right)^{2} $</p>
+<p>其中，$y_i= $第i个样本的真实值，$\hat{y_i} = $第i个样本的预测值，n=样本数量</p>
+<p><strong>特点</strong>：差值被<strong>平方</strong>，所以<strong>较大的误差会被放大</strong>，受到更多"惩罚" ； 函数是<strong>凸函数</strong>，便于优化； 对<strong>异常值敏感</strong>（因为平方会放大异常值的误差） 。</p>
+</li>
+<li>
+<p>交叉熵损失（Cross-Entropy Loss）—— 分类任务的主力</p>
+</li>
+</ol>
+<p><strong>用途</strong>：主要用于<strong>分类问题</strong>，特别是多分类问题。</p>
+<p><strong>公式</strong>（二分类）：$ L = -\frac{1}{n} \sum_{i=1}^{n} \left[ y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i) \right] $</p>
+<pre class="notranslate"><code class="notranslate">**公式**（多分类）： $ L = -\frac{1}{n} \sum_{i=1}^{n} \sum_{c=1}^{C} y_{i, c} \log(\hat{y}_{i, c}) $
+</code></pre>
+<p><strong>直观理解</strong>：它衡量的是<strong>两个概率分布之间的差异</strong>：真实分布 vs 预测分布。当预测概率与真实标签完全一致时，损失为0。当预测与真实完全相反时，损失趋于无穷大。</p>
+<pre class="notranslate"><code class="notranslate">**例子**：猫狗分类（3个样本） 
+</code></pre>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th align="left">真实标签</th>
+<th align="left">模型预测概率（猫，狗）</th>
+<th align="left">交叉熵计算</th>
+<th align="left">损失值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">猫 [1, 0]</td>
+<td align="left">[0.9, 0.1]</td>
+<td align="left">-（1×log(0.9) + 0×log(0.1)）</td>
+<td align="left">0.105</td>
+</tr>
+<tr>
+<td align="left">狗 [0, 1]</td>
+<td align="left">[0.3, 0.7]</td>
+<td align="left">-（0×log(0.3) + 1×log(0.7)）</td>
+<td align="left">0.357</td>
+</tr>
+<tr>
+<td align="left">猫 [1, 0]</td>
+<td align="left">[0.2, 0.8]</td>
+<td align="left">-（1×log(0.2) + 0×log(0.8)）</td>
+<td align="left">1.609</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<pre class="notranslate"><code class="notranslate">**平均损失** = （0.105 + 0.357 + 1.609）/ 3 = 0.690 
+</code></pre>
+<p><strong>特点</strong> ：特别适合与Softmax激活函数配合使用（输出概率分布）。对"错误自信"的预测惩罚更重（如第三个样本，模型很确定是狗[0.8]，但其实是猫）。</p>
+<ol start="3">
+<li>
+<p>二元交叉熵损失（Binary Cross-Entropy）：交叉熵损失在二分类任务下的特例。常用于sigmoid激活函数的输出。</p>
+</li>
+<li>
+<p>其他损失函数：<strong>平均绝对误差（MAE/L1 Loss）</strong>：对异常值不敏感，但梯度不连续。<strong>Huber Loss</strong>：结合MSE和MAE的优点，对异常值鲁棒。</p>
+</li>
+</ol>
+<h3>五、MLP如何学习： 反向传播算法</h3>
+<p>单层感知机有简单的学习规则，但MLP的参数非常多（权重和偏置），需要更强大的学习算法：<strong>反向传播</strong>。</p>
+<p><strong>反向传播的核心思想</strong>：通过<strong>链式法则</strong>将预测误差从输出层向输入层反向传播，从而计算每个参数对总误差的"贡献度"（梯度），然后使用<strong>梯度下降</strong>来更新参数。</p>
+<p><strong>简化版步骤：</strong></p>
+<ol>
+<li>
+<p><strong>前向传播</strong>：输入数据从输入层→隐藏层→输出层，计算最终预测值。计算预测值与真实值之间的<strong>损失函数</strong>（如均方误差、交叉熵）。</p>
+</li>
+<li>
+<p><strong>反向传播</strong>：从输出层开始，计算损失函数对每个参数的<strong>梯度</strong>（偏导数）。利用链式法则，将误差一层一层反向传递，计算每一层参数的梯度。</p>
+<p><strong>关键</strong>：这告诉我们每个权重和偏置应该如何调整才能减少误差。</p>
+</li>
+<li>
+<p><strong>参数更新</strong>：使用梯度下降法，沿着梯度反方向微调所有参数：$W = W- \eta \cdot \frac{\partial L}{\partial W} $，<em>η</em>是学习率，控制更新步长。</p>
+</li>
+</ol>
+<p><strong>比喻</strong>：</p>
+<p>​	<strong>前向传播</strong>：学生参加考试答题。</p>
+<p>​	<strong>计算损失</strong>：老师批改试卷，计算得分。</p>
+<p>​	<strong>反向传播</strong>：老师不仅给出分数，还详细讲解每道题错在哪里、哪个知识点薄弱。</p>
+<p>​	<strong>参数更新</strong>：学生根据反馈，重点复习薄弱环节。</p>
+<h3>六、MLP的能力与局限</h3>
+<h4>万能近似定理</h4>
+<p>理论上，只需一个足够大的隐藏层，MLP就能以任意精度近似任何连续函数。这奠定了神经网络强大的理论基础。</p>
+<h4>局限性</h4>
+<ol>
+<li><strong>全连接导致参数过多</strong>：处理图像等高维数据时，计算量巨大。</li>
+<li><strong>忽略空间结构</strong>：将图像展平会丢失像素间的空间关系。</li>
+<li><strong>更适合表格数据</strong>：对于图像、语音、序列数据，有更专用的网络（CNN、RNN）表现更好。</li>
+</ol></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Leacioupen.github.io">Leacioupen's blog</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Leacioupen/Leacioupen.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script><script>MathJax = {tex: {inlineMath: [["$", "$"]]}};</script><script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</html>
